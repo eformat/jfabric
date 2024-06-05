@@ -1,0 +1,10 @@
+{
+  "catalogs": {},
+  "aliases": {
+    "fabric": {
+      "script-ref": "fabric.java",
+      "java-agents": []
+    }
+  },
+  "templates": {}
+}
