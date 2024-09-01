@@ -1,8 +1,8 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
-//JAVA 17+
+ //JAVA 22+
 // Update the Quarkus version to what you want here or run jbang with
 // `-Dquarkus.version=<version>` to override it.
-//DEPS io.quarkus:quarkus-bom:${quarkus.version:3.11.0}@pom
+//DEPS io.quarkus:quarkus-bom:${quarkus.version:3.14.1}@pom
 //DEPS io.quarkus:quarkus-picocli
 //DEPS io.quarkus:quarkus-rest-client
 
@@ -10,18 +10,6 @@
 //DEPS io.quarkiverse.langchain4j:quarkus-langchain4j-openai:RELEASE
 
 //FILES application.properties
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -36,6 +24,18 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @CommandLine.Command(description = """
         An open source framework for augmenting humans using AI.
@@ -132,7 +132,7 @@ class AI {
             });
 
             try {
-                return future.get(60, TimeUnit.SECONDS);
+                return future.get(600, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 throw new IllegalStateException(e);
             }
