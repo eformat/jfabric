@@ -1,5 +1,5 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
- //JAVA 22+
+//JAVA 22+
 // Update the Quarkus version to what you want here or run jbang with
 // `-Dquarkus.version=<version>` to override it.
 //DEPS io.quarkus:quarkus-bom:${quarkus.version:3.14.1}@pom
@@ -20,6 +20,7 @@ import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.output.Response;
 import io.quarkus.logging.Log;
+import io.vertx.core.Vertx;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import picocli.CommandLine;
@@ -44,13 +45,13 @@ import java.util.concurrent.TimeoutException;
             """)
 public class fabric implements Runnable {
 
-    @Option(names = { "-p", "--pattern" }, description = "The pattern (prompt) to use", required = true)
+    @Option(names = {"-p", "--pattern"}, description = "The pattern (prompt) to use", required = true)
     String pattern;
 
-    @Option(names = { "-t", "--text" }, description = "The text to use")
+    @Option(names = {"-t", "--text"}, description = "The text to use")
     String text;
 
-    @Option(names = { "-s", "--stream" }, description = "Stream the response")
+    @Option(names = {"-s", "--stream"}, description = "Stream the response")
     boolean stream;
 
     private final AI ai;
@@ -59,8 +60,15 @@ public class fabric implements Runnable {
         this.ai = ai;
     }
 
+    @Inject
+    Vertx vertx;
+
     @Override
     public void run() {
+        vertx.exceptionHandler(ex -> {
+            Log.info(">>> Swallowing: ", ex);
+        });
+
         if (text == null || "-".equals(text)) {
             try (Scanner scanner = new Scanner(System.in)) {
                 StringBuilder inputText = new StringBuilder();
@@ -72,6 +80,7 @@ public class fabric implements Runnable {
         }
 
         String result = ai.prompt(pattern, text, stream);
+
         if (!stream) {
             System.out.println(result);
         }
@@ -136,6 +145,7 @@ class AI {
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 throw new IllegalStateException(e);
             }
+
         } else {
             return clm.generate(messages).content().text();
         }
