@@ -104,7 +104,7 @@ class AI {
 
     String prompt(String pattern, String text, boolean stream) {
 
-        String urlPattern = "https://raw.githubusercontent.com/danielmiessler/fabric/main/patterns/%s/"
+        String urlPattern = "https://raw.githubusercontent.com/eformat/fabric/main/patterns/%s/"
                 .formatted(pattern);
 
         var user = downloadContent(urlPattern + "user.md");
