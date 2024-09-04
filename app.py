@@ -122,7 +122,7 @@ if st.session_state.start_chat:
 
             for f in uploaded_files:
                 file_path = os.path.join(DOCUMENT_SOURCE_DIRECTORY, f.name)
-                cmd = "java -jar tika-app-3.0.0-BETA2.jar --text " + file_path + " | jbang run fabric.java -p create_app3 -s"
+                cmd = "java -jar tika-app-3.0.0-BETA2.jar --text '" + file_path + "' | jbang run fabric.java -p create_app3 -s"
                 #print(os.popen(cmd).read())
                 print(f"[INFO] Processing {f.name}")
                 my_env = os.environ.copy()
