@@ -1,0 +1,19 @@
+FROM quay.io/eformat/ubi-mvn-builder:latest
+USER root
+RUN microdnf install -y python-pip tar && microdnf clean all
+WORKDIR $HOME
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+USER 1001
+RUN curl -Ls https://sh.jbang.dev | bash -s - app setup
+ENV PATH="$HOME/.jbang/bin:$PATH"
+RUN jbang jdk install $(java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.vm.specification.version' | awk '{print $3}') $(java -XshowSettings:properties -version 2>&1 > /dev/null | grep 'java.home' | awk '{print $3}')
+COPY app.py .
+COPY assets assets
+COPY tika-app-3.0.0-BETA2.jar .
+COPY application.properties application.properties
+COPY fabric.java fabric.java
+RUN jbang build fabric.java
+EXPOSE 8501
+ENTRYPOINT [ "streamlit", "run" ,"app.py" ]
