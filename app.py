@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+import pandas as pd
 import streamlit as st
 
 from langchain_openai import ChatOpenAI
@@ -89,7 +90,7 @@ with st.sidebar:
             st.session_state.start_chat = True
 
 if st.session_state.start_chat:
-    st.title("💬 App3 Generator")
+    st.title("💬 Document Analyzer and Generator")
     st.caption("🚀 A LLM app driven by LlamaEdge")
 
     # Display chat messages from history on app rerun
@@ -99,6 +100,21 @@ if st.session_state.start_chat:
 
     if "uploaded_files" not in st.session_state:
         st.session_state.uploaded_files = []
+
+    # Dataframe drop down list
+    data = {
+        'Category': ['create_app3', 'create_summary', 'analyze_tech_impact', 'extract_ideas'],
+        'Subcategory': ['Create App3', 'Create Summary', 'Analyze Technical Impact', 'Extract Ideas']
+    }
+
+    df = pd.DataFrame(data)
+
+    # Create the primary dropdown for Category
+    selected_category = st.selectbox("Select Pattern", df['Subcategory'].unique())
+
+    # Filter the dataframe based on the selected category
+    filtered_df = df[df['Subcategory'] == selected_category]
+    pattern = filtered_df['Category'].unique().tolist()[0]
 
     with st.spinner("Loading documents..."):
         uploaded_files = st.file_uploader(
@@ -122,8 +138,8 @@ if st.session_state.start_chat:
 
             for f in uploaded_files:
                 file_path = os.path.join(DOCUMENT_SOURCE_DIRECTORY, f.name)
-                cmd = "java -jar tika-app-3.0.0-BETA2.jar --text '" + file_path + "' | jbang run fabric.java -p create_app3 -s"
-                print(f"[INFO] Processing {f.name}")
+                cmd = "java -jar tika-app-3.0.0-BETA2.jar --text '" + file_path + "' | jbang run fabric.java -p " + pattern + " -s"
+                print(f"[INFO] Processing {f.name} with {pattern}")
                 my_env = os.environ.copy()
                 my_env["INFERENCE_SERVER_URL"] = service_url
                 my_env["MODEL_NAME"] = model_name
